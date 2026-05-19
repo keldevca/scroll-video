@@ -7,12 +7,13 @@ export function useVideoFrames(src, fps = 20) {
 
   useEffect(() => {
     let cancelled = false
+    const urls = []
 
     async function extract() {
       const isMobile = window.matchMedia('(max-width: 767px)').matches
-      const effectiveFps = isMobile ? 12 : fps
-      const scale = isMobile ? 0.55 : 1
-      const quality = isMobile ? 0.82 : 0.92
+      const effectiveFps = isMobile ? 10 : fps
+      const scale = isMobile ? 0.5 : 1
+      const quality = isMobile ? 0.78 : 0.92
 
       const video = document.createElement('video')
       video.src = src
@@ -21,41 +22,53 @@ export function useVideoFrames(src, fps = 20) {
       video.setAttribute('playsinline', '')
       video.setAttribute('webkit-playsinline', '')
       video.preload = 'auto'
+      video.style.position = 'fixed'
+      video.style.left = '-9999px'
+      video.style.width = '1px'
+      video.style.height = '1px'
+      document.body.appendChild(video)
 
-      await new Promise((resolve, reject) => {
-        video.onloadedmetadata = resolve
-        video.onerror = reject
-      })
-
-      const totalFrames = Math.floor(video.duration * effectiveFps)
-      const canvas = document.createElement('canvas')
-      canvas.width = Math.floor(video.videoWidth * scale)
-      canvas.height = Math.floor(video.videoHeight * scale)
-      const ctx = canvas.getContext('2d')
-      const out = []
-
-      for (let i = 0; i < totalFrames; i++) {
-        if (cancelled) return
-        video.currentTime = i / effectiveFps
-        await new Promise((resolve) => {
-          let done = false
-          const finish = () => { if (!done) { done = true; resolve() } }
-          video.onseeked = finish
-          setTimeout(finish, 500)
+      try {
+        await new Promise((resolve, reject) => {
+          video.onloadedmetadata = resolve
+          video.onerror = reject
         })
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
-        out.push(canvas.toDataURL('image/webp', quality))
-        setProgress(Math.round(((i + 1) / totalFrames) * 100))
-      }
 
-      if (!cancelled) {
-        setFrames(out)
-        setLoading(false)
+        const totalFrames = Math.floor(video.duration * effectiveFps)
+        const canvas = document.createElement('canvas')
+        canvas.width = Math.floor(video.videoWidth * scale)
+        canvas.height = Math.floor(video.videoHeight * scale)
+        const ctx = canvas.getContext('2d')
+
+        for (let i = 0; i < totalFrames; i++) {
+          if (cancelled) return
+          video.currentTime = i / effectiveFps
+          await new Promise((resolve) => {
+            let done = false
+            const finish = () => { if (!done) { done = true; resolve() } }
+            video.onseeked = finish
+            setTimeout(finish, 1500)
+          })
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
+          const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/webp', quality))
+          if (blob) urls.push(URL.createObjectURL(blob))
+          setProgress(Math.round(((i + 1) / totalFrames) * 100))
+        }
+
+        if (!cancelled) {
+          setFrames(urls.slice())
+          setLoading(false)
+        }
+      } finally {
+        video.remove()
       }
     }
 
     extract()
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+      urls.forEach(URL.revokeObjectURL)
+    }
   }, [src, fps])
 
   return { frames, loading, progress }
