@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-export function useVideoFrames(src, fps = 20) {
+export function useVideoFrames(src, fps = 12) {
   const [frames, setFrames] = useState([])
   const [progress, setProgress] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -10,17 +10,10 @@ export function useVideoFrames(src, fps = 20) {
     const urls = []
 
     async function extract() {
-      const isMobile = window.matchMedia('(max-width: 767px)').matches
-      const effectiveFps = isMobile ? 10 : fps
-      const scale = isMobile ? 0.5 : 1
-      const quality = isMobile ? 0.78 : 0.92
-
       const video = document.createElement('video')
       video.src = src
       video.muted = true
       video.playsInline = true
-      video.setAttribute('playsinline', '')
-      video.setAttribute('webkit-playsinline', '')
       video.preload = 'auto'
       video.style.position = 'fixed'
       video.style.left = '-9999px'
@@ -34,7 +27,8 @@ export function useVideoFrames(src, fps = 20) {
           video.onerror = reject
         })
 
-        const totalFrames = Math.floor(video.duration * effectiveFps)
+        const totalFrames = Math.floor(video.duration * fps)
+        const scale = 0.7
         const canvas = document.createElement('canvas')
         canvas.width = Math.floor(video.videoWidth * scale)
         canvas.height = Math.floor(video.videoHeight * scale)
@@ -42,7 +36,7 @@ export function useVideoFrames(src, fps = 20) {
 
         for (let i = 0; i < totalFrames; i++) {
           if (cancelled) return
-          video.currentTime = i / effectiveFps
+          video.currentTime = i / fps
           await new Promise((resolve) => {
             let done = false
             const finish = () => { if (!done) { done = true; resolve() } }
@@ -50,7 +44,7 @@ export function useVideoFrames(src, fps = 20) {
             setTimeout(finish, 1500)
           })
           ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
-          const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/webp', quality))
+          const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/webp', 0.85))
           if (blob) urls.push(URL.createObjectURL(blob))
           setProgress(Math.round(((i + 1) / totalFrames) * 100))
         }

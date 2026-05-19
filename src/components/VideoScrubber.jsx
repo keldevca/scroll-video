@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react'
 export default function VideoScrubber({ frames, videoSrc }) {
   const canvasRef = useRef(null)
   const videoRef = useRef(null)
+  const mediaWrapRef = useRef(null)
   const containerRef = useRef(null)
   const titleRef = useRef(null)
   const mastheadRef = useRef(null)
@@ -61,6 +62,8 @@ export default function VideoScrubber({ frames, videoSrc }) {
 
       const cutoutFade = Math.max(0, Math.min(1, (progress - 0.85) / 0.13))
       cutoutRef.current.style.opacity = cutoutFade
+      const mediaFade = 1 - Math.max(0, Math.min(1, (progress - 0.92) / 0.07))
+      mediaWrapRef.current.style.opacity = mediaFade
       mastheadRef.current.classList.toggle('reveal-on', progress > 0.65)
       coverlinesRef.current.classList.toggle('reveal-on', progress > 0.78)
       flashRef.current.classList.toggle('flash-burst', progress > 0.85 && progress < 0.99)
@@ -89,7 +92,7 @@ export default function VideoScrubber({ frames, videoSrc }) {
   return (
     <div ref={containerRef} style={{ height: `${scrollHeight}px` }}>
       <div className="sticky top-0 h-screen bg-black overflow-hidden p-3 sm:p-4">
-        <div className="absolute inset-3 sm:inset-4 rounded-2xl sm:rounded-3xl overflow-hidden">
+        <div ref={mediaWrapRef} className="absolute inset-3 sm:inset-4 rounded-2xl sm:rounded-3xl overflow-hidden" style={{ willChange: 'opacity' }}>
           {useVideo ? (
             <video
               ref={videoRef}
@@ -104,8 +107,8 @@ export default function VideoScrubber({ frames, videoSrc }) {
           ) : (
             <canvas
               ref={canvasRef}
-              width={2048}
-              height={1080}
+              width={1433}
+              height={756}
               className="w-full h-full object-cover"
             />
           )}
