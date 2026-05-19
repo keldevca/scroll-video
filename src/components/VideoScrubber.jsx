@@ -19,6 +19,7 @@ export default function VideoScrubber({ frames, videoSrc }) {
     let images = []
     let ctx = null
     let currentIndex = -1
+    let lastVideoUpdate = 0
 
     if (!useVideo) {
       if (frames.length === 0) return
@@ -45,9 +46,15 @@ export default function VideoScrubber({ frames, videoSrc }) {
       const progress = Math.min(scrolled / scrollable, 1)
 
       if (useVideo) {
-        const video = videoRef.current
-        if (video.duration) {
-          video.currentTime = progress * video.duration
+        const now = performance.now()
+        if (now - lastVideoUpdate > 50) {
+          lastVideoUpdate = now
+          const video = videoRef.current
+          if (video.duration) {
+            const time = progress * video.duration
+            if (video.fastSeek) video.fastSeek(time)
+            else video.currentTime = time
+          }
         }
       } else {
         const index = Math.floor(progress * (frames.length - 1))
