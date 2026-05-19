@@ -95,8 +95,10 @@ export default function VideoScrubber({ frames, videoSrc }) {
               ref={videoRef}
               src={videoSrc}
               muted
+              autoPlay
               playsInline
               preload="auto"
+              onLoadedMetadata={(e) => { e.currentTarget.pause(); e.currentTarget.currentTime = 0.01 }}
               className="w-full h-full object-cover"
             />
           ) : (
