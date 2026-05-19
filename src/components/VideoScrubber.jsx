@@ -120,7 +120,7 @@ export default function VideoScrubber({ frames }) {
           className="absolute inset-3 sm:inset-4 rounded-2xl sm:rounded-3xl overflow-hidden pointer-events-none opacity-0 z-30"
           style={{ willChange: 'opacity' }}
         >
-          <img src="/cutout.png" alt="" className="w-full h-full object-cover select-none" />
+          <img src={`${import.meta.env.BASE_URL}cutout.png`} alt="" className="w-full h-full object-cover select-none" />
         </div>
 
         <div

@@ -2,7 +2,7 @@ import { useVideoFrames } from './hooks/useVideoFrames'
 import Nav from './components/Nav'
 import VideoScrubber from './components/VideoScrubber'
 
-const VIDEO_SRC = '/video/model.mp4'
+const VIDEO_SRC = `${import.meta.env.BASE_URL}video/model.mp4`
 
 export default function App() {
   const { frames, loading, progress } = useVideoFrames(VIDEO_SRC)
