@@ -136,7 +136,7 @@ export default function VideoScrubber({ frames }) {
             May
           </div>
 
-          <div className="absolute top-[30%] left-8 sm:left-16 max-w-[42%] flex flex-col gap-7 sm:gap-10 text-left drop-shadow">
+          <div className="hidden sm:flex absolute top-[30%] left-8 sm:left-16 max-w-[42%] flex-col gap-7 sm:gap-10 text-left drop-shadow">
             <div className="reveal delay-2 leading-[1.05]">
               <p className="text-base sm:text-xl lg:text-2xl font-extrabold uppercase tracking-wide">
                 <span className="text-rose-500">Effortless</span> Silhouettes
@@ -151,7 +151,7 @@ export default function VideoScrubber({ frames }) {
             </div>
           </div>
 
-          <div className="absolute top-[30%] right-8 sm:right-16 max-w-[42%] flex flex-col gap-7 sm:gap-10 text-right items-end drop-shadow">
+          <div className="hidden sm:flex absolute top-[30%] right-8 sm:right-16 max-w-[42%] flex-col gap-7 sm:gap-10 text-right items-end drop-shadow">
             <div className="reveal delay-2 leading-[1.05]">
               <p className="text-base sm:text-xl lg:text-2xl font-extrabold uppercase tracking-wide">
                 <span className="text-amber-300">The Atelier</span> Issue
