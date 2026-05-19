@@ -1,4 +1,4 @@
-const GITHUB_URL = 'https://github.com'
+const GITHUB_URL = 'https://github.com/keldevca/scroll-video'
 const LINKEDIN_URL = 'https://www.linkedin.com/in/kellydev/'
 
 export default function Nav() {
