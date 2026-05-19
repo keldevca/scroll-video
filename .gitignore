@@ -25,3 +25,4 @@ dist-ssr
 
 # Local-only video backups
 public/video/*_original.mp4
+public/gif/
