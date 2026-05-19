@@ -47,11 +47,14 @@ export default function VideoScrubber({ frames, videoSrc }) {
 
       if (useVideo) {
         const now = performance.now()
-        if (now - lastVideoUpdate > 50) {
+        if (now - lastVideoUpdate > 80) {
           lastVideoUpdate = now
           const video = videoRef.current
           if (video.duration) {
-            video.currentTime = progress * video.duration
+            const time = progress * video.duration
+            if (Math.abs(time - video.currentTime) > 0.05) {
+              video.currentTime = time
+            }
           }
         }
       } else {
