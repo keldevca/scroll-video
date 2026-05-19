@@ -4,6 +4,11 @@
   --font-serif: "Playfair Display", ui-serif, Georgia, serif;
 }
 
+html, body {
+  overscroll-behavior: none;
+  overflow-x: hidden;
+}
+
 @keyframes flashBurst {
   0%, 100% { opacity: 0; }
   2%       { opacity: 0.55; }
