@@ -26,3 +26,5 @@ dist-ssr
 # Local-only video backups
 public/video/*_original.mp4
 public/gif/
+public/last-frame.png
+public/vogues-inpiration.png

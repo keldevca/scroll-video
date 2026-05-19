@@ -1,9 +1,38 @@
+import { useEffect, useRef } from 'react'
+
 const GITHUB_URL = 'https://github.com/keldevca/scroll-video'
 const LINKEDIN_URL = 'https://www.linkedin.com/in/kellydev/'
 
 export default function Nav() {
+  const navRef = useRef(null)
+
+  useEffect(() => {
+    let raf = null
+    const update = () => {
+      raf = null
+      const scrollable = document.body.scrollHeight - window.innerHeight
+      const progress = scrollable > 0 ? window.scrollY / scrollable : 0
+      const fade = Math.max(0, Math.min(1, 1 - (progress - 0.62) / 0.15))
+      navRef.current.style.opacity = fade
+      navRef.current.style.pointerEvents = fade > 0.05 ? 'auto' : 'none'
+    }
+    const onScroll = () => { if (raf === null) raf = requestAnimationFrame(update) }
+    update()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', update, { passive: true })
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', update)
+      if (raf !== null) cancelAnimationFrame(raf)
+    }
+  }, [])
+
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-6 text-white">
+    <nav
+      ref={navRef}
+      className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-5 sm:px-8 py-4 sm:py-6 text-white"
+      style={{ willChange: 'opacity' }}
+    >
       <a href="#" className="flex items-baseline font-serif leading-none">
         <span className="text-3xl font-bold">M</span>
         <span className="text-xl italic font-light mx-0.5 opacity-80">&amp;</span>
