@@ -51,9 +51,7 @@ export default function VideoScrubber({ frames, videoSrc }) {
           lastVideoUpdate = now
           const video = videoRef.current
           if (video.duration) {
-            const time = progress * video.duration
-            if (video.fastSeek) video.fastSeek(time)
-            else video.currentTime = time
+            video.currentTime = progress * video.duration
           }
         }
       } else {
