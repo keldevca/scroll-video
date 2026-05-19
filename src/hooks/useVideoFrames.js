@@ -12,7 +12,10 @@ export function useVideoFrames(src, fps = 20) {
       const video = document.createElement('video')
       video.src = src
       video.muted = true
-      video.crossOrigin = 'anonymous'
+      video.playsInline = true
+      video.setAttribute('playsinline', '')
+      video.setAttribute('webkit-playsinline', '')
+      video.preload = 'auto'
 
       await new Promise((resolve, reject) => {
         video.onloadedmetadata = resolve
@@ -29,7 +32,12 @@ export function useVideoFrames(src, fps = 20) {
       for (let i = 0; i < totalFrames; i++) {
         if (cancelled) return
         video.currentTime = i / fps
-        await new Promise((resolve) => { video.onseeked = resolve })
+        await new Promise((resolve) => {
+          let done = false
+          const finish = () => { if (!done) { done = true; resolve() } }
+          video.onseeked = finish
+          setTimeout(finish, 500)
+        })
         ctx.drawImage(video, 0, 0)
         out.push(canvas.toDataURL('image/webp', 0.92))
         setProgress(Math.round(((i + 1) / totalFrames) * 100))
