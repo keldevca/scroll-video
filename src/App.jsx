@@ -1,10 +1,24 @@
+import { useState, useEffect } from 'react'
 import { useVideoFrames } from './hooks/useVideoFrames'
 import Nav from './components/Nav'
 import VideoScrubber from './components/VideoScrubber'
 
 const VIDEO_SRC = `${import.meta.env.BASE_URL}video/model.mp4`
 
-export default function App() {
+function useIsMobile() {
+  const [mobile, setMobile] = useState(() =>
+    typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches
+  )
+  useEffect(() => {
+    const mql = window.matchMedia('(max-width: 767px)')
+    const handler = (e) => setMobile(e.matches)
+    mql.addEventListener('change', handler)
+    return () => mql.removeEventListener('change', handler)
+  }, [])
+  return mobile
+}
+
+function DesktopApp() {
   const { frames, loading, progress } = useVideoFrames(VIDEO_SRC)
 
   if (loading) {
@@ -22,4 +36,18 @@ export default function App() {
       <VideoScrubber frames={frames} />
     </main>
   )
+}
+
+function MobileApp() {
+  return (
+    <main className="bg-black">
+      <Nav />
+      <VideoScrubber videoSrc={VIDEO_SRC} />
+    </main>
+  )
+}
+
+export default function App() {
+  const isMobile = useIsMobile()
+  return isMobile ? <MobileApp /> : <DesktopApp />
 }

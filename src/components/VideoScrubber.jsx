@@ -1,7 +1,8 @@
 import { useEffect, useRef } from 'react'
 
-export default function VideoScrubber({ frames }) {
+export default function VideoScrubber({ frames, videoSrc }) {
   const canvasRef = useRef(null)
+  const videoRef = useRef(null)
   const containerRef = useRef(null)
   const titleRef = useRef(null)
   const mastheadRef = useRef(null)
@@ -9,25 +10,30 @@ export default function VideoScrubber({ frames }) {
   const coverlinesRef = useRef(null)
   const flashRef = useRef(null)
 
+  const useVideo = !!videoSrc
+  const scrollHeight = useVideo ? 5000 : frames.length * 30
+
   useEffect(() => {
-    if (frames.length === 0) return
-
-    const images = frames.map((src) => {
-      const img = new Image()
-      img.src = src
-      return img
-    })
-
-    const canvas = canvasRef.current
-    const ctx = canvas.getContext('2d')
-    let currentIndex = -1
     let rafId = null
+    let images = []
+    let ctx = null
+    let currentIndex = -1
+
+    if (!useVideo) {
+      if (frames.length === 0) return
+      images = frames.map((src) => {
+        const img = new Image()
+        img.src = src
+        return img
+      })
+      ctx = canvasRef.current.getContext('2d')
+    }
 
     const drawFrame = (index) => {
       const image = images[index]
-      if (!image.complete) return
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
-      ctx.drawImage(image, 0, 0, canvas.width, canvas.height)
+      if (!image || !image.complete) return
+      ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height)
+      ctx.drawImage(image, 0, 0, canvasRef.current.width, canvasRef.current.height)
     }
 
     const update = () => {
@@ -36,11 +42,18 @@ export default function VideoScrubber({ frames }) {
       const scrollable = rect.height - window.innerHeight
       const scrolled = Math.max(0, -rect.top)
       const progress = Math.min(scrolled / scrollable, 1)
-      const index = Math.floor(progress * (frames.length - 1))
 
-      if (index !== currentIndex) {
-        currentIndex = index
-        drawFrame(index)
+      if (useVideo) {
+        const video = videoRef.current
+        if (video.duration) {
+          video.currentTime = progress * video.duration
+        }
+      } else {
+        const index = Math.floor(progress * (frames.length - 1))
+        if (index !== currentIndex) {
+          currentIndex = index
+          drawFrame(index)
+        }
       }
 
       const titleFade = Math.max(0, 1 - (progress - 0.03) / 0.18)
@@ -57,9 +70,11 @@ export default function VideoScrubber({ frames }) {
       if (rafId === null) rafId = requestAnimationFrame(update)
     }
 
-    const first = images[0]
-    if (first.complete) drawFrame(0)
-    else first.onload = () => drawFrame(0)
+    if (!useVideo) {
+      const first = images[0]
+      if (first.complete) drawFrame(0)
+      else first.onload = () => drawFrame(0)
+    }
 
     update()
     window.addEventListener('scroll', onScroll, { passive: true })
@@ -69,18 +84,29 @@ export default function VideoScrubber({ frames }) {
       window.removeEventListener('resize', update)
       if (rafId !== null) cancelAnimationFrame(rafId)
     }
-  }, [frames])
+  }, [frames, useVideo])
 
   return (
-    <div ref={containerRef} style={{ height: `${frames.length * 30}px` }}>
+    <div ref={containerRef} style={{ height: `${scrollHeight}px` }}>
       <div className="sticky top-0 h-screen bg-black overflow-hidden p-3 sm:p-4">
         <div className="absolute inset-3 sm:inset-4 rounded-2xl sm:rounded-3xl overflow-hidden">
-          <canvas
-            ref={canvasRef}
-            width={2048}
-            height={1080}
-            className="w-full h-full object-cover"
-          />
+          {useVideo ? (
+            <video
+              ref={videoRef}
+              src={videoSrc}
+              muted
+              playsInline
+              preload="auto"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <canvas
+              ref={canvasRef}
+              width={2048}
+              height={1080}
+              className="w-full h-full object-cover"
+            />
+          )}
         </div>
 
         <div
