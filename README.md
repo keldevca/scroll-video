@@ -1,5 +1,11 @@
 <div align="center">
 
+https://github.com/user-attachments/assets/0a664dbf-2a37-4ef6-bbf6-2e4d39af0aff
+
+</div>
+
+<div align="center">
+
 # Mode &nbsp;*&*&nbsp; Passion
 
 ### A scroll-driven fashion experience
@@ -7,12 +13,6 @@
 *A minimalist single-page interaction where a fashion sequence plays frame by frame as you scroll, ending with an editorial reveal.*
 
 [**Live Demo**](#) · [**LinkedIn**](https://www.linkedin.com/in/kellydev/)
-
-</div>
-
-<div align="center">
-
-https://github.com/user-attachments/assets/0a664dbf-2a37-4ef6-bbf6-2e4d39af0aff
 
 </div>
 
